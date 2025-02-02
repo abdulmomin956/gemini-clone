@@ -24,7 +24,6 @@ const ContextProvider = props => {
 
 
     const onSent = async (prompt) => {
-        console.log(prompt)
         setResultData("")
         setLoading(true)
         setShowResult(true)
