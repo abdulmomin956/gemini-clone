@@ -174,10 +174,14 @@
     }
 }
 
-.result-data p {
+.result-data div {
     font-size: 17px;
     font-weight: 300;
     line-height: 1.8;
+}
+
+.result-data div p {
+    margin-bottom: 15px;
 }
 
 @media (max-width:600px) {

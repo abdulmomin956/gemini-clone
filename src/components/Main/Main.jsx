@@ -1,7 +1,11 @@
-import React, { useContext } from 'react'
+import React, { Fragment, useContext } from 'react'
 import './Main.css'
 import { assets } from '../../assets/assets'
 import { Context } from '../../context/Context'
+import Markdown from 'react-markdown'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { atelierForestLight } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 const Main = () => {
   const { prevPrompts,
@@ -13,9 +17,11 @@ const Main = () => {
     loading,
     resultData,
     input,
-    setInput } = useContext(Context)
+    setInput,
+    allChats } = useContext(Context)
 
 
+  console.log(allChats)
   return (
     <div className='main'>
       <div className="nav">
@@ -48,7 +54,45 @@ const Main = () => {
           </div>
         </> :
           <>
-            <div className='result'>
+            <div className="result">
+              {allChats.length > 0 && allChats[0].map((chat, index) =>
+                <Fragment key={index}>
+                  <div className="result-title">
+                    <img src={assets.user_icon} alt="" />
+                    <p>{chat.prompt}</p>
+                  </div>
+                  <div className='result-data'>
+                    <img src={assets.gemini_icon} alt="" />
+                    <div >
+                      <Markdown
+                        children={chat.result}
+                        components={{
+                          code(props) {
+                            const { children, className, node, ...rest } = props
+                            const match = /language-(\w+)/.exec(className || '')
+                            return match ? (
+                              <SyntaxHighlighter
+                                {...rest}
+                                PreTag="div"
+                                children={String(children).replace(/\n$/, '')}
+                                language={match[1]}
+                                style={atelierForestLight}
+                              />
+                            ) : (
+                              <code {...rest} className={className}>
+                                {children}
+                              </code>
+                            )
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Fragment>
+              )}
+            </div>
+
+            {/* <div className='result'>
               <div className="result-title">
                 <img src={assets.user_icon} alt="" />
                 <p>{recentPrompt}</p>
@@ -62,11 +106,35 @@ const Main = () => {
                       <hr />
                       <hr />
                     </div> :
-                    <p dangerouslySetInnerHTML={{ __html: resultData }}></p>
+                    <div >
+                      <Markdown
+                        children={resultData}
+                        components={{
+                          code(props) {
+                            const { children, className, node, ...rest } = props
+                            const match = /language-(\w+)/.exec(className || '')
+                            return match ? (
+                              <SyntaxHighlighter
+                                {...rest}
+                                PreTag="div"
+                                children={String(children).replace(/\n$/, '')}
+                                language={match[1]}
+                                style={atelierForestLight}
+                              />
+                            ) : (
+                              <code {...rest} className={className}>
+                                {children}
+                              </code>
+                            )
+                          }
+                        }}
+                      />
+                    </div>
+
                 }
 
               </div>
-            </div>
+            </div> */}
           </>
         }
 
