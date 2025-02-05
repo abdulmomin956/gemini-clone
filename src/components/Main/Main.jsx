@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react'
+import React, { Fragment, useContext, useEffect, useRef } from 'react'
 import './Main.css'
 import { assets } from '../../assets/assets'
 import { Context } from '../../context/Context'
@@ -8,17 +8,13 @@ import { atelierForestLight } from 'react-syntax-highlighter/dist/esm/styles/hlj
 import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 const Main = () => {
-  const { prevPrompts,
-    setPrevPrompts,
+  const {
     onSent,
-    recentPrompt,
-    setRecentPrompt,
     showResult,
-    loading,
-    resultData,
     input,
     setInput,
-    allChats } = useContext(Context)
+    allChats,
+    currChat } = useContext(Context)
 
 
   console.log(allChats)
@@ -28,7 +24,7 @@ const Main = () => {
         <p>Gemini</p>
         <img src={assets.user_icon} alt="" />
       </div>
-      <div className="main-container">
+      <div className="main-container" >
         {!showResult ? <>
           <div className="greet">
             <p><span>Hello, Dev.</span></p>
@@ -55,7 +51,7 @@ const Main = () => {
         </> :
           <>
             <div className="result">
-              {allChats.length > 0 && allChats[0].map((chat, index) =>
+              {allChats.length > 0 && allChats[currChat].map((chat, index) =>
                 <Fragment key={index}>
                   <div className="result-title">
                     <img src={assets.user_icon} alt="" />
@@ -63,78 +59,42 @@ const Main = () => {
                   </div>
                   <div className='result-data'>
                     <img src={assets.gemini_icon} alt="" />
-                    <div >
-                      <Markdown
-                        children={chat.result}
-                        components={{
-                          code(props) {
-                            const { children, className, node, ...rest } = props
-                            const match = /language-(\w+)/.exec(className || '')
-                            return match ? (
-                              <SyntaxHighlighter
-                                {...rest}
-                                PreTag="div"
-                                children={String(children).replace(/\n$/, '')}
-                                language={match[1]}
-                                style={atelierForestLight}
-                              />
-                            ) : (
-                              <code {...rest} className={className}>
-                                {children}
-                              </code>
-                            )
-                          }
-                        }}
-                      />
-                    </div>
+                    {chat.loading ?
+                      <div className='loader'>
+                        <hr />
+                        <hr />
+                        <hr />
+                      </div> :
+                      <div >
+                        <Markdown
+                          children={chat.result}
+                          components={{
+                            code(props) {
+                              const { children, className, node, ...rest } = props
+                              const match = /language-(\w+)/.exec(className || '')
+                              return match ? (
+                                <SyntaxHighlighter
+                                  {...rest}
+                                  PreTag="div"
+                                  children={String(children).replace(/\n$/, '')}
+                                  language={match[1]}
+                                  style={atelierForestLight}
+                                />
+                              ) : (
+                                <code {...rest} className={className}>
+                                  {children}
+                                </code>
+                              )
+                            }
+                          }}
+                        />
+                      </div>
+                    }
+
                   </div>
                 </Fragment>
               )}
             </div>
-
-            {/* <div className='result'>
-              <div className="result-title">
-                <img src={assets.user_icon} alt="" />
-                <p>{recentPrompt}</p>
-              </div>
-              <div className='result-data'>
-                <img src={assets.gemini_icon} alt="" />
-                {
-                  loading ?
-                    <div className='loader'>
-                      <hr />
-                      <hr />
-                      <hr />
-                    </div> :
-                    <div >
-                      <Markdown
-                        children={resultData}
-                        components={{
-                          code(props) {
-                            const { children, className, node, ...rest } = props
-                            const match = /language-(\w+)/.exec(className || '')
-                            return match ? (
-                              <SyntaxHighlighter
-                                {...rest}
-                                PreTag="div"
-                                children={String(children).replace(/\n$/, '')}
-                                language={match[1]}
-                                style={atelierForestLight}
-                              />
-                            ) : (
-                              <code {...rest} className={className}>
-                                {children}
-                              </code>
-                            )
-                          }
-                        }}
-                      />
-                    </div>
-
-                }
-
-              </div>
-            </div> */}
           </>
         }
 

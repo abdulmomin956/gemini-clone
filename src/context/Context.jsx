@@ -31,6 +31,8 @@ const ContextProvider = props => {
   const newChat = () => {
     setLoading(false)
     setShowResult(false)
+    setIsNew(true);
+    setCurrChat(prev => prev + 1)
   }
 
 
@@ -43,28 +45,44 @@ const ContextProvider = props => {
       setRecentPrompt(prompt)
       response = await run(prompt)
     } else {
-      setRecentPrompt(input)
-      setPrevPrompts(prev => [...prev, input])
-      response = await run(input)
       if (isNew) {
-        setAllChats(prev => [...prev, [{ prompt: input, result: response }]])
-        setIsNew(false)
+        setPrevPrompts(prev => [...prev, input])
+        setAllChats(prev => [...prev, [{ loading: true, prompt: input }]])
       } else {
-        debugger
         setAllChats(prev =>
           prev.map((innerArray, i) =>
-            i === currChat ? [...innerArray, { prompt: input, result: response }] : innerArray
+            i === currChat ? [...innerArray, { loading: true, prompt: input }] : innerArray
+          )
+        )
+      }
+      setRecentPrompt(input)
+      response = await run(input)
+      if (isNew) {
+        setAllChats(prev =>
+          prev.map((innerArray, i) =>
+            i === currChat ?
+              innerArray.map(obj => (obj.loading ? { prompt: input, result: response } : obj))
+              : innerArray
+          )
+        )
+        setIsNew(false)
+      } else {
+        setAllChats(prev =>
+          prev.map((innerArray, i) =>
+            i === currChat ?
+              innerArray.map(obj => (obj.loading ? { prompt: input, result: response } : obj))
+              : innerArray
           )
         )
       }
     }
-    console.log(response)
+    //console.log(response)
     // setResultData(response)
     let newResponseArray = response.split(" ")
-    for (let i = 0; i < newResponseArray.length; i++) {
-      const nextWord = newResponseArray[i]
-      delayPara(i, nextWord + " ")
-    }
+    // for (let i = 0; i < newResponseArray.length; i++) {
+    //   const nextWord = newResponseArray[i]
+    //   delayPara(i, nextWord + " ")
+    // }
     setLoading(false)
     setInput("")
   }
@@ -86,7 +104,9 @@ const ContextProvider = props => {
     allChats,
     setAllChats,
     isNew,
-    setIsNew
+    setIsNew,
+    currChat,
+    setCurrChat
   }
 
   return (
